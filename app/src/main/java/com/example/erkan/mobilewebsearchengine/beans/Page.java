@@ -11,7 +11,9 @@ public class Page {
     private Integer         authorityScore;
 
     public Page(String url) {
-        this.url = url;
+        this.url                = url;
+        this.outgoingPageList   = new ArrayList<>();
+        this.incomingPageList   = new ArrayList<>();
     }
 
     public String getUrl() {

@@ -140,6 +140,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-26.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test.espresso:espresso-idling-resource-3.0.2" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:/home/erkan/Desktop/Lessons/Information Retrieval and Web Search Engines/Term_Project/app/libs/commons-io-2.6.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: org.jsoup:jsoup:1.7.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-library:1.3@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-integration:1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-solver:1.1.3@jar" level="project" />
