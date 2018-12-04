@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                                 intent.putExtra("hitsTime", baseRepository.getHitsTime());
                                 intent.putExtra("urlList", urlList);
                                 intent.putExtra("start", 0);
-                                intent.putExtra("length", 10);
+                                intent.putExtra("length", (urlList.size() > 10 ? 10 : urlList.size()));
                                 startActivity(intent);
 
                             } catch (Exception e){

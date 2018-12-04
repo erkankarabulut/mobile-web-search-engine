@@ -71,8 +71,8 @@ public class BaseRepository {
         final String agent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
         URL url = new URL(path);
         final URLConnection connection = url.openConnection();
-        connection.setReadTimeout(100);
-        connection.setConnectTimeout(100);
+        connection.setReadTimeout(500);
+        connection.setConnectTimeout(500);
         /**
          * User-Agent is mandatory otherwise Google will return HTTP response
          * code: 403
@@ -122,8 +122,8 @@ public class BaseRepository {
             try {
                 url             = new URL(link);
                 con             = url.openConnection();
-                con.setConnectTimeout(100);
-                con.setReadTimeout(100);
+                con.setConnectTimeout(500);
+                con.setReadTimeout(500);
                 con.setRequestProperty("User-Agent", agent);
                 con.connect();
 
@@ -162,7 +162,7 @@ public class BaseRepository {
 
             start = System.currentTimeMillis();
             rootPageSet = new ArrayList<>();
-            for (int i=0; i<links.subList(0, result).size(); i++) {
+            for (int i=0; i<links.subList(0, (result > links.size() ? links.size() : result)).size(); i++) {
                 rootPageSet.add(new Page(links.get(i)));
             }
 

@@ -53,8 +53,8 @@ public class HITSAlgorithm {
             try{
                 url             = new URL(page.getUrl());
                 con             = url.openConnection();
-                con.setConnectTimeout(100);
-                con.setReadTimeout(100);
+                con.setConnectTimeout(500);
+                con.setReadTimeout(500);
                 con.setRequestProperty("User-Agent", agent);
                 con.connect();
 

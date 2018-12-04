@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.erkan.mobilewebsearchengine.R;
 import com.example.erkan.mobilewebsearchengine.action.HITSAlgorithm;
@@ -28,14 +29,16 @@ public class ResultsActivity extends AppCompatActivity implements MyRecyclerView
 
     Button previous;
     Button next;
+    TextView queryResultString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
 
-        previous = (Button) findViewById(R.id.previousButton);
-        next     = (Button) findViewById(R.id.nextButton);
+        previous            = (Button) findViewById(R.id.previousButton);
+        next                = (Button) findViewById(R.id.nextButton);
+        queryResultString   = (TextView) findViewById(R.id.queryResultString);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -52,6 +55,8 @@ public class ResultsActivity extends AppCompatActivity implements MyRecyclerView
         final Integer start   = getIntent().getIntExtra("start", 0);
         final Integer length  = getIntent().getIntExtra("length", 10);
 
+        queryResultString.setText("Showing " + length + " results between " + start + " and " + (start + length) + " out of " +
+            newURLList.size() + " results.");
         if (start == 0){
             previous.setVisibility(View.GONE);
         }else {
@@ -82,7 +87,7 @@ public class ResultsActivity extends AppCompatActivity implements MyRecyclerView
                 intent.putExtra("hitsTime", hitsTime);
                 intent.putExtra("urlList", newURLList);
                 intent.putExtra("start", start+10);
-                intent.putExtra("length", 10);
+                intent.putExtra("length", (newURLList.size() > 10 ? 10 : newURLList.size()));
                 startActivity(intent);
             }
         });
@@ -97,7 +102,7 @@ public class ResultsActivity extends AppCompatActivity implements MyRecyclerView
                 intent.putExtra("hitsTime", hitsTime);
                 intent.putExtra("urlList", newURLList);
                 intent.putExtra("start", start-10);
-                intent.putExtra("length", 10);
+                intent.putExtra("length", (newURLList.size() > 10 ? 10 : newURLList.size()));
                 startActivity(intent);
             }
         });
