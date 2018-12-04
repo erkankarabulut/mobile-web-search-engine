@@ -1,19 +1,22 @@
 package com.example.erkan.mobilewebsearchengine.beans;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Page {
+public class Page implements Serializable{
 
     private String          url;
     private ArrayList<Page> outgoingPageList;
     private ArrayList<Page> incomingPageList;
-    private Integer         hubScore;
-    private Integer         authorityScore;
+    private Double         hubScore;
+    private Double         authorityScore;
 
     public Page(String url) {
         this.url                = url;
         this.outgoingPageList   = new ArrayList<>();
         this.incomingPageList   = new ArrayList<>();
+        this.hubScore           = 1.0;
+        this.authorityScore     = 1.0;
     }
 
     public String getUrl() {
@@ -40,19 +43,20 @@ public class Page {
         this.incomingPageList = incomingPageList;
     }
 
-    public Integer getHubScore() {
+    public Double getHubScore() {
         return hubScore;
     }
 
-    public void setHubScore(Integer hubScore) {
+    public void setHubScore(Double hubScore) {
         this.hubScore = hubScore;
     }
 
-    public Integer getAuthorityScore() {
+    public Double getAuthorityScore() {
         return authorityScore;
     }
 
-    public void setAuthorityScore(Integer authorityScore) {
+    public void setAuthorityScore(Double authorityScore) {
         this.authorityScore = authorityScore;
     }
+
 }

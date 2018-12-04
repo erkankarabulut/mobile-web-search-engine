@@ -1,5 +1,6 @@
 package com.example.erkan.mobilewebsearchengine.activities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +24,8 @@ public class MainActivity extends AppCompatActivity {
     public Button searchButton;
 
     public String inputString;
-    public static final Integer result = 50;
+    public static final Integer total  = 50;
+    public static final Integer result = 20;
     public Long start;
 
     public ArrayList<Page> rootPageSet;
@@ -37,9 +39,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setActivityBackgroundColor(Color.WHITE);
 
-        searchInput     = (EditText) findViewById(R.id.search_input);
-        feelingLucky    = (Button) findViewById(R.id.feeling_lucky);
-        searchButton    = (Button) findViewById(R.id.search_button);
+        searchInput         = (EditText) findViewById(R.id.search_input);
+        feelingLucky        = (Button) findViewById(R.id.feeling_lucky);
+        searchButton        = (Button) findViewById(R.id.search_button);
 
         hitsAlgorithm   = new HITSAlgorithm();
 
@@ -54,23 +56,17 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                inputString = inputString.replaceAll(" ", "+");
-                                String query = "https://www.google.com/search?q=" + inputString + "&num=" + result;
-                                String page = BaseRepository.getSearchContent(query);
-                                List<String> links = BaseRepository.parseLinks(page);
+                                BaseRepository baseRepository = new BaseRepository();
+                                ArrayList<String> urlList = baseRepository.getFinalUrlList(inputString);
 
-                                start = System.currentTimeMillis();
-                                rootPageSet = new ArrayList<>();
-                                for (int i=0; i<links.size(); i++) {
-                                    rootPageSet.add(new Page(links.get(i)));
-                                }
-
-                                System.out.println("Time to create root set: " + (System.currentTimeMillis() - start)
-                                    + "\nRoot set element count: " + rootPageSet.size());
-                                start = System.currentTimeMillis();
-                                basePageSet = hitsAlgorithm.getBasePageSet(rootPageSet);
-                                System.out.println("Time to create base set: " + (System.currentTimeMillis() - start)
-                                    + "\nBase set element count: " + basePageSet.size());
+                                Intent intent = new Intent(MainActivity.this, ResultsActivity.class);
+                                intent.putExtra("rootSetTime", baseRepository.getRootSetTime());
+                                intent.putExtra("baseSetTime", baseRepository.getBaseSetTime());
+                                intent.putExtra("hitsTime", baseRepository.getHitsTime());
+                                intent.putExtra("urlList", urlList);
+                                intent.putExtra("start", 0);
+                                intent.putExtra("length", 10);
+                                startActivity(intent);
 
                             } catch (Exception e){
                                 e.printStackTrace();
@@ -89,4 +85,5 @@ public class MainActivity extends AppCompatActivity {
         View view = this.getWindow().getDecorView();
         view.setBackgroundColor(color);
     }
+
 }

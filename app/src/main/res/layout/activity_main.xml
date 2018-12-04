@@ -47,9 +47,6 @@
                 android:text="I'm Feeling Lucky"/>
 
         </LinearLayout>
-
     </LinearLayout>
-
-
 
 </RelativeLayout>

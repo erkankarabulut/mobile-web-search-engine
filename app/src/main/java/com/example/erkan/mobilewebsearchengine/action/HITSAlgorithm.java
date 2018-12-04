@@ -1,6 +1,7 @@
 package com.example.erkan.mobilewebsearchengine.action;
 
 import com.example.erkan.mobilewebsearchengine.beans.Page;
+import com.example.erkan.mobilewebsearchengine.util.URLUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
@@ -11,12 +12,18 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class HITSAlgorithm {
 
     private final String agent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)";
+    private URLUtil urlUtil;
+
+    public HITSAlgorithm(){
+        urlUtil = new URLUtil();
+    }
 
     public ArrayList<String> findOutgoingPages(String content){
         ArrayList<String> outgoingURLList = new ArrayList<>();
@@ -46,8 +53,8 @@ public class HITSAlgorithm {
             try{
                 url             = new URL(page.getUrl());
                 con             = url.openConnection();
-                con.setConnectTimeout(500);
-                con.setReadTimeout(500);
+                con.setConnectTimeout(100);
+                con.setReadTimeout(100);
                 con.setRequestProperty("User-Agent", agent);
                 con.connect();
 
@@ -60,16 +67,17 @@ public class HITSAlgorithm {
                 for(String outgoingPage : outgoingPages){
                     Page temp;
 
-                    if(!checkIfURLExist(baseSet, outgoingPage)){
+                    if(!urlUtil.checkIfURLExist(baseSet, outgoingPage)){
                         temp = new Page(outgoingPage);
                     }else {
-                        temp = getPageWithURL(baseSet, outgoingPage);
+                        temp = urlUtil.getPageWithURL(baseSet, outgoingPage);
                     }
 
                     baseSet.add(temp);
                     page.getOutgoingPageList().add(temp);
                     temp.getIncomingPageList().add(page);
                 }
+
             }catch (Exception e){
                 pagesToBeRemoved.add(page);
             }
@@ -79,26 +87,66 @@ public class HITSAlgorithm {
         return baseSet;
     }
 
-    public boolean checkIfURLExist(ArrayList<Page> pageList, String url){
-        Boolean result = false;
-        for (Page page : pageList){
-            if(page.getUrl().equals(url)){
-                result = true;
-                break;
+    public ArrayList<String> applyHITSAlgorithm(ArrayList<Page> basePageSet, List<String> links){
+        // Authority and hubs values of all pages are initially set to 1 while creating them
+        Integer k = new Integer(3);  // Run the algoritm for 10 steps
+        Double norm;                       // Normalization variable
+        for(int i=0; i<k; i++){
+            norm = new Double(0);
+            for (Page page : basePageSet){
+                page.setAuthorityScore(0.0);
+                for(Page incoming : page.getIncomingPageList()){
+                    page.setAuthorityScore(page.getAuthorityScore() + incoming.getHubScore());
+                }
+
+                norm += Math.sqrt(page.getAuthorityScore());
+            }
+
+            norm = Math.sqrt(norm);
+            for (Page page : basePageSet){
+                page.setAuthorityScore((page.getAuthorityScore() / norm));
+            }
+
+            norm = 0.0;
+            for (Page page : basePageSet){
+                page.setHubScore(0.0);
+                for(Page outgoing : page.getOutgoingPageList()){
+                    page.setHubScore(page.getHubScore() + outgoing.getAuthorityScore());
+                }
+
+                norm += Math.sqrt(page.getHubScore());
+            }
+
+            norm = Math.sqrt(norm);
+            for(Page page : basePageSet){
+                page.setHubScore((page.getHubScore() / norm));
             }
         }
 
-        return result;
-    }
+        Double hubsAuthorityDifference;
+        Double max;
+        for(int i=0; i<basePageSet.size()-1; i++){
+            max = Math.abs(basePageSet.get(i).getAuthorityScore() - basePageSet.get(i).getHubScore());
+            for(int j=i+1; j<basePageSet.size(); j++){
+               hubsAuthorityDifference = Math.abs(basePageSet.get(j).getAuthorityScore() - basePageSet.get(j).getHubScore());
+               if(max < hubsAuthorityDifference){
+                   Page temp = basePageSet.get(j);
+                   basePageSet.set(j, basePageSet.get(i));
+                   basePageSet.set(i, temp);
 
-    public Page getPageWithURL(ArrayList<Page> pageList, String url){
-        Page result = null;
-        for(Page page : pageList){
-            if(page.getUrl().equals(url)){
-                result = page;
+                   max = hubsAuthorityDifference;
+               }
             }
         }
 
-        return result;
+        ArrayList<String> urlList = new ArrayList<>();
+        for(Page page : basePageSet){
+            if(links.contains(page.getUrl())){
+                urlList.add(page.getUrl());
+            }
+        }
+
+        return urlList;
     }
+
 }
